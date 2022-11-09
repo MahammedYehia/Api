@@ -14,18 +14,19 @@ namespace Api.Controllers
     {
          private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: api/GetAllUsers
-        [HttpGet]
-        [Route("Api/GetAllUsers")]
-        public IQueryable<User> GetAllUsers()
+        //GET: api/GetAllUsers
+       [HttpGet]
+       [Route("Api/GetAllUsers")]
+        public List<User> GetAllUsers()
         {
-            return db.Users;
+            return db.Users.ToList();
         }
+
         [HttpGet]
         [Route("Api/GetUsersByType")]
-        public IQueryable<User> GetUsersByType(string type)
+        public List<User> GetUsersByType(string type)
         {
-            return db.Users.Where(x=>x.UserType==type);
+            return db.Users.Where(x => x.UserType == type).ToList();
         }
         // GET: api/GetUserById
         [HttpGet]
@@ -41,7 +42,7 @@ namespace Api.Controllers
             return Ok(user);
         }
         [HttpPut]
-        [Route("Api/UpdateUser?id")]
+        [Route("Api/UpdateUser/id")]
 
         public IHttpActionResult UpdateUser(int id, User user)
         {
@@ -77,7 +78,7 @@ namespace Api.Controllers
         }
         // DELETE: api/Users1/5
         [HttpDelete]
-        [Route("Api/DeleteUser?Id")]
+        [Route("Api/DeleteUser/Id")]
         public IHttpActionResult DeleteUser(int id)
         {
             User user = db.Users.Find(id);
@@ -116,6 +117,32 @@ namespace Api.Controllers
             user.Password = null;
             return Ok(user);
         }
+
+        [HttpPost]
+        [Route("Api/Register")]
+        public IHttpActionResult Register(User user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var Exist = db.Users.Any(x => x.Phone == user.Phone &&x.UserType==user.UserType);
+            if (!Exist)
+            {
+                user.Password = Encrypt(user.Password);
+                db.Users.Add(user);
+                db.SaveChanges();
+            }
+            else
+            {
+                ModelState.AddModelError(nameof(user.Phone), "The Phone Number Is Exit Before!");
+                return BadRequest(ModelState);
+            }
+            return Ok(user);
+
+        }
+
+
         private bool UserExists(int id)
         {
             return db.Users.Count(e => e.UserId == id) > 0;
