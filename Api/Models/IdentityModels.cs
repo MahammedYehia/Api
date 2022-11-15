@@ -32,5 +32,6 @@ namespace Api.Models
         }
         public DbSet<User> Users { get; set; }
 
+        public System.Data.Entity.DbSet<Api.Models.Group> Groups { get; set; }
     }
 }

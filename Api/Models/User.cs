@@ -32,5 +32,7 @@ namespace Api.Models
 
         [Required]
         public string UserType { get; set; }
+        public ICollection<Group> Groups { get; set; }
+        public string StudentCode { get;  set; }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using Api.Models;
+using Api.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -107,41 +109,67 @@ namespace Api.Controllers
                 return NotFound();
             }
             user.Password = Encrypt(user.Password);
-            var Exist = db.Users.Any(x => x.Phone == user.Phone && x.Password == user.Password && x.UserType == user.UserType);
-            if (!Exist)
+            var ExistModel = db.Users.FirstOrDefault(x => x.Phone == user.Phone && x.Password == user.Password && x.UserType == user.UserType);
+            if (ExistModel == null)
 
             {
-                ModelState.AddModelError(nameof(user.Phone), "INCORRECT UserName and Password");
+                ModelState.AddModelError(nameof(user.Phone), "INCORRECT Phone Or Password");
                 return BadRequest(ModelState);
             }
-            user.Password = null;
-            return Ok(user);
+            ExistModel.Password = null;
+            ExistModel.ConfirmPassword = null;
+            ExistModel.Groups = null;
+            return Ok(ExistModel);
         }
 
         [HttpPost]
         [Route("Api/Register")]
-        public IHttpActionResult Register(User user)
+        public IHttpActionResult Register(RegisterViewModel userViewModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var Exist = db.Users.Any(x => x.Phone == user.Phone &&x.UserType==user.UserType);
+            var Exist = db.Users.Any(x => x.Phone == userViewModel.Phone &&x.UserType==userViewModel.UserType);
+         
             if (!Exist)
             {
-                user.Password = Encrypt(user.Password);
+                   var user = new User();
+                    user.UserName = userViewModel.UserName;
+                    user.Password = Encrypt(userViewModel.Password);
+                    user.ConfirmPassword = Encrypt(userViewModel.ConfirmPassword);
+                    user.Phone = userViewModel.Phone;
+                    user.UserType = userViewModel.UserType;
+                    if (userViewModel.UserType == "Student")
+                    {
+                        user.StudentCode = GetStudentCodeAutomatic();
+                    }
                 db.Users.Add(user);
                 db.SaveChanges();
+                user.ConfirmPassword = null;
+                user.Password = null;
+                return Ok(user);
             }
             else
             {
-                ModelState.AddModelError(nameof(user.Phone), "The Phone Number Is Exit Before!");
+                ModelState.AddModelError(nameof(userViewModel.Phone), "The Phone Number Is Exit Before!");
                 return BadRequest(ModelState);
             }
-            return Ok(user);
+            
+           
 
         }
 
+        private string GetStudentCodeAutomatic()
+        {
+            var code = "100";
+           var MaxCode= db.Users.Where(x => x.UserType == "Student").Max(x => x.StudentCode);
+            if (!string.IsNullOrEmpty(MaxCode))
+            {
+                return (int.Parse(MaxCode)+1).ToString();
+            }
+            return code;
+        }
 
         private bool UserExists(int id)
         {
