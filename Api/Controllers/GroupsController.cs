@@ -86,7 +86,6 @@ namespace Api.Controllers
                 return BadRequest(ModelState);
             }
             var model = new Group();
-
             model.GroupName = group.GroupName;
             model.Educationallevel = group.Educationallevel;
             model.Term = group.Term;
