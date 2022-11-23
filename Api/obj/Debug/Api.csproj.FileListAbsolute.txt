@@ -128,6 +128,3 @@ F:\VisualStudio2015Projects\Api\Api\bin\zh-Hant\System.Spatial.resources.dll
 F:\VisualStudio2015Projects\Api\Api\obj\Debug\Api.Migrations.studentCode.resources
 F:\VisualStudio2015Projects\Api\Api\obj\Debug\Api.Migrations.studentCode2.resources
 F:\VisualStudio2015Projects\Api\Api\obj\Debug\Api.Migrations.studentCode3.resources
-F:\VisualStudio2015Projects\Api\Api\obj\Debug\Api.csproj.AssemblyReference.cache
-F:\VisualStudio2015Projects\Api\Api\obj\Debug\Api.csproj.CoreCompileInputs.cache
-F:\VisualStudio2015Projects\Api\Api\obj\Debug\Api.csproj.CopyComplete
